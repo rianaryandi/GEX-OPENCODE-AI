@@ -3,7 +3,8 @@ FROM node:22-bookworm-slim
 # python + ffmpeg (ekstrak frame video) + curl (health check)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip ffmpeg curl \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -sf /usr/bin/python3 /usr/local/bin/python
 
 # OpenCode CLI (menyediakan `opencode serve`)
 RUN npm install -g opencode-ai
