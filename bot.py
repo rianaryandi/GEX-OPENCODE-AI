@@ -80,7 +80,11 @@ def oc(method: str, path: str, payload: dict | None = None) -> dict:
             method, OPENCODE_URL + path, json=payload,
             auth=(SERVER_USER, SERVER_PASS),
         )
-        r.raise_for_status()
+        try:
+            r.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            # Sertakan body agar pesan error Telegram menunjukkan penyebab aslinya
+            raise RuntimeError(f"{e} | body: {(r.text or '')[:300]}") from None
         return r.json() if r.text else {}
 
 
