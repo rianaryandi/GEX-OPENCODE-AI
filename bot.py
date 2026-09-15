@@ -43,10 +43,10 @@ log = logging.getLogger("tg-opencode")
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
 OWNER_ID = int(os.environ["TELEGRAM_OWNER_ID"])
-OPENCODE_URL = os.environ.get("OPENCODE_URL", "http://127.0.0.1:4096")
-OPENCODE_MODEL = os.environ.get("OPENCODE_MODEL", "opencode/gpt-5.6-luna")
-SERVER_USER = os.environ.get("OPENCODE_SERVER_USERNAME", "opencode")
-SERVER_PASS = os.environ.get("OPENCODE_SERVER_PASSWORD", "changeme")
+OPENCODE_URL = os.environ.get("OPENCODE_URL") or "http://127.0.0.1:4096"
+OPENCODE_MODEL = os.environ.get("OPENCODE_MODEL") or "opencode/gpt-5.6-luna"
+SERVER_USER = os.environ.get("OPENCODE_SERVER_USERNAME") or "opencode"
+SERVER_PASS = os.environ.get("OPENCODE_SERVER_PASSWORD") or "changeme"
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/app/data"))
 INCOMING = DATA_DIR / "incoming"
