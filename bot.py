@@ -123,9 +123,24 @@ def ask_oc(chat_id: int, text: str) -> str:
     if m:
         payload["model"] = m
     data = oc("POST", f"/session/{sid}/message", payload)
-    texts = [p.get("text", "") for p in data.get("parts", []) if p.get("type") == "text"]
-    jawab = "".join(texts).strip()
-    return jawab or "(agen tidak mengembalikan teks)"
+    parts = data.get("parts", [])
+    texts = [p.get("text", "") for p in parts
+             if p.get("type") == "text" and p.get("text")]
+    if texts:
+        return "".join(texts).strip()
+    # Tanpa teks: tampilkan penyebab asli (error model/provider) biar tidak misterius
+    info = data.get("info", {}) or {}
+    err = info.get("error")
+    try:
+        log.warning("tanpa teks: part_types=%s info_error=%s",
+                    [p.get("type") for p in parts], json.dumps(err)[:300])
+    except Exception:
+        pass
+    if isinstance(err, dict):
+        msg = ((err.get("data") or {}).get("message")) or err.get("name") or err.get("message")
+        if msg:
+            return f"(gagal dari model: {msg})"
+    return "(agen tidak mengembalikan teks)"
 
 
 # ---------- video -> frame ----------
