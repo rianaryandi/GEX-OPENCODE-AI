@@ -8,10 +8,16 @@ mkdir -p ~/.local/share/opencode /app/work /app/data /app/data/incoming
 #    dari komputermu (~/.local/share/opencode/auth.json setelah `opencode auth login`)
 if [ -n "$OPENCODE_AUTH_JSON" ]; then
   echo "$OPENCODE_AUTH_JSON" > ~/.local/share/opencode/auth.json
-  echo "[entrypoint] auth.json ditulis."
+  echo "[entrypoint] auth.json ditulis ($(wc -c < ~/.local/share/opencode/auth.json) byte)."
 else
   echo "[entrypoint] WARNING: OPENCODE_AUTH_JSON kosong, OpenCode akan gagal auth."
 fi
+
+# 1b) Normalisasi env kosong (Railway variable yg ada tapi kosong = string kosong,
+#     bukan default). Kosongkan sekalian agar default dipakai.
+for v in OPENCODE_MODEL OPENCODE_SERVER_USERNAME DATA_DIR; do
+  if [ -z "${!v}" ]; then unset "$v"; fi
+done
 
 # 2) Config model (bisa diganti via env OPENCODE_MODEL, default vision + wajar)
 #    Ditulis di /app/work karena serve berjalan dengan cwd di sana.
@@ -31,8 +37,14 @@ export OPENCODE_SERVER_PASSWORD="${OPENCODE_SERVER_PASSWORD:-changeme}"
 export OPENCODE_SERVER_USERNAME="${OPENCODE_SERVER_USERNAME:-opencode}"
 
 # 4) Jalankan serve di workdir /app/work (file bot & kerja agen di sana)
+#    DEBUG_MODE=1 -> log level DEBUG supaya penyebab 500 kelihatan di Logs
 cd /app/work
-opencode serve --port 4096 --hostname 127.0.0.1 &
+if [ "${DEBUG_MODE}" = "1" ]; then
+  echo "[entrypoint] DEBUG_MODE aktif."
+  opencode --log-level DEBUG serve --port 4096 --hostname 127.0.0.1 &
+else
+  opencode serve --port 4096 --hostname 127.0.0.1 &
+fi
 SERVE_PID=$!
 
 # 5) Tunggu sehat
