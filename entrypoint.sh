@@ -8,10 +8,38 @@ mkdir -p ~/.local/share/opencode /app/work /app/data /app/data/incoming
 #    dari komputermu (~/.local/share/opencode/auth.json setelah `opencode auth login`)
 if [ -n "$OPENCODE_AUTH_JSON" ]; then
   echo "$OPENCODE_AUTH_JSON" > ~/.local/share/opencode/auth.json
-  echo "[entrypoint] auth.json ditulis ($(wc -c < ~/.local/share/opencode/auth.json) byte)."
 else
   echo "[entrypoint] WARNING: OPENCODE_AUTH_JSON kosong, OpenCode akan gagal auth."
 fi
+
+# 1b) Validasi + normalisasi auth.json. Auth.json yang cacat (paste kepotong /
+#     terbungkus kutip) bikin serve 500 misterius — gagalkan start dgn pesan jelas.
+python3 - ~/.local/share/opencode/auth.json <<'PYEOF'
+import json, sys
+p = sys.argv[1]
+try:
+    raw = open(p).read()
+except FileNotFoundError:
+    print("[entrypoint] auth.json TIDAK ADA — isi OPENCODE_AUTH_JSON dulu.")
+    sys.exit(3)
+try:
+    d = json.loads(raw)
+except Exception as e:
+    print(f"[entrypoint] auth.json RUSAK ({e}). Paste ulang persis dari hasil `cat ~/.local/share/opencode/auth.json`.")
+    sys.exit(3)
+if isinstance(d, str):  # kepaste terbungkus kutip, coba parse sekali lagi
+    try:
+        d = json.loads(d)
+    except Exception as e:
+        print(f"[entrypoint] auth.json RUSAK ({e}). Paste ulang.")
+        sys.exit(3)
+if not isinstance(d, dict) or "opencode" not in d:
+    print("[entrypoint] auth.json RUSAK (tidak ada kunci 'opencode'). Paste ulang dari hasil `cat`.")
+    sys.exit(3)
+open(p, "w").write(json.dumps(d))
+print(f"[entrypoint] auth.json VALID ({len(json.dumps(d))} byte), provider: {','.join(d.keys())}.")
+PYEOF
+[ $? -ne 0 ] && echo "[entrypoint] Berhenti karena auth.json bermasalah." && exit 1
 
 # 1b) Normalisasi env kosong (Railway variable yg ada tapi kosong = string kosong,
 #     bukan default). Kosongkan sekalian agar default dipakai.
