@@ -100,12 +100,25 @@ def get_session(chat_id: int) -> str:
     return sid
 
 
+def _model_obj() -> dict | None:
+    """Ubah 'opencode/gpt-5.6-luna' -> {'providerID': ..., 'modelID': ...}.
+    API serve menolak model berbentuk string (400 Bad Request)."""
+    spec = (OPENCODE_MODEL or "").strip()
+    if not spec or "/" not in spec:
+        return None  # pakai model default server (opencode.json)
+    provider, _, model = spec.partition("/")
+    if not provider or not model:
+        return None
+    return {"providerID": provider, "modelID": model}
+
+
 def ask_oc(chat_id: int, text: str) -> str:
     sid = get_session(chat_id)
-    data = oc("POST", f"/session/{sid}/message", {
-        "model": OPENCODE_MODEL,
-        "parts": [{"type": "text", "text": text}],
-    })
+    payload: dict = {"parts": [{"type": "text", "text": text}]}
+    m = _model_obj()
+    if m:
+        payload["model"] = m
+    data = oc("POST", f"/session/{sid}/message", payload)
     texts = [p.get("text", "") for p in data.get("parts", []) if p.get("type") == "text"]
     jawab = "".join(texts).strip()
     return jawab or "(agen tidak mengembalikan teks)"
