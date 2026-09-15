@@ -22,6 +22,9 @@ try:
 except FileNotFoundError:
     print("[entrypoint] auth.json TIDAK ADA — isi OPENCODE_AUTH_JSON dulu.")
     sys.exit(3)
+# Buang karakter tak terlihat yg sering ikut ke-copy (BOM, zero-width, LRM/RLM)
+# di awal/akhir value — ini penyebab "char 0" misterius.
+raw = raw.lstrip("\ufeff\u200b\u200c\u200d\u200e\u200f\u2060\u00a0 \t\r\n").rstrip(" \t\r\n")
 try:
     d = json.loads(raw)
 except Exception as e:
