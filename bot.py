@@ -17,7 +17,7 @@ from telegram.ext import (
 # ==============  ISI BAGIAN INI  ==============
 OPENROUTER_API_KEY = "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"
 TELEGRAM_BOT_TOKEN = "8217020684:AAElZycbMOju34cQuFdyH8U6aP5iqs9-juk"
-MODEL = "meta-llama/llama-3.1-8b-instruct:free"
+MODEL = "qwen/qwen2.5-vl-3b-instruct:free"
 SITE_URL = "https://t.me/gexcode_bot"
 SITE_NAME = "XA - GDDO AI"
 # ===============================================
