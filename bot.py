@@ -17,7 +17,7 @@ from telegram.ext import (
 OPENROUTER_API_KEY = "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"
 TELEGRAM_BOT_TOKEN = "8217020684:AAElZycbMOju34cQuFdyH8U6aP5iqs9-juk"
 MODEL = "Qwen/Qwen2.5-Coder-7B-Instruct"
-SITE_URL = "https://t.me/XA_GDDO_AI"       # Ganti dengan link bot kamu
+SITE_URL = "https://t.me/gexcode_bot"       # Ganti dengan link bot kamu
 SITE_NAME = "XA - GDDO AI"
 # ===============================================
 
