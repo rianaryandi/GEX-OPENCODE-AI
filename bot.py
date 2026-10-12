@@ -15,7 +15,7 @@ from telegram.ext import (
 )
 
 # ==============  ISI BAGIAN INI  ==============
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = "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"
 TELEGRAM_BOT_TOKEN = "8217020684:AAElZycbMOju34cQuFdyH8U6aP5iqs9-juk"
 MODEL = "meta-llama/llama-3.1-8b-instruct:free"
 SITE_URL = "https://t.me/gexcode_bot"
