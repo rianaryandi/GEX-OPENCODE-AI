@@ -26,8 +26,8 @@ client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=OPENROUTER_API_KEY,
     default_headers={
-        "HTTP-Referer": SITE_URL,
-        "X-Title": SITE_NAME,
+        "HTTP-Referer": "https://t.me/XA_GDDO_AI",
+        "X-Title": "XA - GDDO AI",
     }
 )
 
